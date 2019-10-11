@@ -2,16 +2,7 @@ defmodule Transmog.Parser do
   @moduledoc false
 
   def parse(pairs) when is_list(pairs) do
-    pairs =
-      Enum.reduce_while(pairs, [], fn
-        {from, to}, acc when is_binary(from) and is_binary(to) ->
-          {:cont, acc ++ [{from_string(from), from_string(to)}]}
-
-        _, _ ->
-          {:halt, {:error, :invalid_pair}}
-      end)
-
-    case pairs do
+    case Enum.reduce_while(pairs, [], &parse_pair/2) do
       {:error, _} = error -> error
       pairs -> {:ok, pairs}
     end
@@ -25,4 +16,10 @@ defmodule Transmog.Parser do
 
   defp parse_field(":" <> field) when is_binary(field), do: String.to_existing_atom(field)
   defp parse_field(field) when is_binary(field), do: field
+
+  defp parse_pair({from, to}, pairs) when is_binary(from) and is_binary(to) do
+    {:cont, pairs ++ [{from_string(from), from_string(to)}]}
+  end
+
+  defp parse_pair(_, _), do: {:halt, {:error, :invalid_pair}}
 end
