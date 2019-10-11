@@ -45,7 +45,7 @@ defmodule TransmogExample do
   @key_mapping [
     {"account", ":user"},
     {"account.identity", ":user.:details"},
-    {"account.identity.first_name", ":user.:details.:first_name}
+    {"account.identity.first_name", ":user.:details.:first_name"}
   ]
 end
 ```
