@@ -5,6 +5,7 @@ defmodule Transmog.MixProject do
     [
       app: :transmog,
       deps: deps(),
+      dialyzer: [flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs]],
       elixir: "~> 1.9",
       preferred_cli_env: [
         coveralls: :test,
@@ -28,6 +29,7 @@ defmodule Transmog.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.10", only: :test}
     ]
   end
