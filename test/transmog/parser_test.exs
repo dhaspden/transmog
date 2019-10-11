@@ -6,7 +6,7 @@ defmodule Transmog.ParserTest do
   alias Transmog.Parser
 
   describe "parse/1" do
-    test "given a valid list of pairs, then a list of Parsers are returned" do
+    test "given a valid list of pairs, then a list of parsers are returned" do
       input = [{":a.b", "a.b"}]
       expected = [{[:a, "b"], ["a", "b"]}]
 
@@ -19,6 +19,32 @@ defmodule Transmog.ParserTest do
       input = [{nil, "a.b"}]
 
       assert {:error, :invalid_pair} = Parser.parse(input)
+    end
+  end
+
+  describe "valid?/1" do
+    test "given a valid list of pairs, then true is returned" do
+      input = [{[:a, "b"], ["a", "b"]}]
+
+      assert Parser.valid?(input)
+    end
+
+    test "when the first pair is invalid, then false is returned" do
+      input = [{nil, ["a", "b"]}]
+
+      refute Parser.valid?(input)
+    end
+
+    test "when the second pair is invalid, then false is returned" do
+      input = [{[:a, "b"], nil}]
+
+      refute Parser.valid?(input)
+    end
+
+    test "when pairs have a different length, then false is returned" do
+      input = [{[:a, "b"], ["b"]}]
+
+      refute Parser.valid?(input)
     end
   end
 end

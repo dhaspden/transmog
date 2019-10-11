@@ -8,6 +8,8 @@ defmodule Transmog.Parser do
     end
   end
 
+  def valid?(pairs) when is_list(pairs), do: Enum.all?(pairs, &valid_pair?/1)
+
   defp from_string(path) when is_binary(path) do
     path
     |> String.split(".")
@@ -22,4 +24,13 @@ defmodule Transmog.Parser do
   end
 
   defp parse_pair(_, _), do: {:halt, {:error, :invalid_pair}}
+
+  defp valid_field?(field) when is_atom(field) or is_binary(field), do: true
+  defp valid_field?(_), do: false
+
+  defp valid_pair?({from, to}) when is_list(from) and is_list(to) do
+    length(from) == length(to) && Enum.all?(from ++ to, &valid_field?/1)
+  end
+
+  defp valid_pair?(_), do: false
 end
