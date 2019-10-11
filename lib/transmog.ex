@@ -58,7 +58,7 @@ defmodule Transmog do
   @typedoc """
   `result` is the type for the output from `format/2`.
   """
-  @type result :: {:ok, formattable} | {:error, atom}
+  @type result :: {:ok, formattable} | Parser.error()
 
   @doc """
   `format/2` takes either a list or a map and changes the keys of the maps
