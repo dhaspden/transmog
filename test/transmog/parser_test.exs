@@ -46,5 +46,11 @@ defmodule Transmog.ParserTest do
 
       refute Parser.valid?(input)
     end
+
+    test "when any other value is given, then false is returned" do
+      input = fn -> nil end
+
+      refute Parser.valid?(input)
+    end
   end
 end

@@ -1,5 +1,15 @@
 defmodule Transmog.Parser do
-  @moduledoc false
+  @moduledoc """
+  `Parser` is a module which parses the two tuple dot notation strings into a
+  format that can be understood by the rest of the library. It is able to parse
+  values of the format "a.b.c" into the library format of ["a", "b", "c"],
+  for example.
+
+  It exposes two functions. `parse/1` is the main exported function from this
+  module which parses the dot notation strings into the special format.
+  `valid?/1` takes a parsed value and returns whether or not the pairs value
+  is valid.
+  """
 
   @typedoc """
   `error` is the type for an error that occurs during parsing. During parsing if
@@ -55,8 +65,9 @@ defmodule Transmog.Parser do
       false
 
   """
-  @spec valid?(pairs :: [Transmog.pair()]) :: boolean
+  @spec valid?(pairs :: term) :: boolean
   def valid?(pairs) when is_list(pairs), do: Enum.all?(pairs, &valid_pair?/1)
+  def valid?(_), do: false
 
   # Converts a dot notation string into a path list. Atoms will be parsed from
   # strings if applicable at this stage.
