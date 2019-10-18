@@ -25,4 +25,8 @@ jobs:
             - _build
       - run: mix format --check-formatted
       - run: mix dialyzer
-      - run: mix test
+      - run: mix coveralls.json
+      - run: bash <(curl -s https://codecov.io/bash)
+      - store_artifacts:
+          path: cover
+          destination: coverage_results
