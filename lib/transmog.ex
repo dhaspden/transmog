@@ -41,7 +41,7 @@ defmodule Transmog do
   @typedoc """
   `key` is the type of valid key parsed in a key mapping.
   """
-  @type key :: atom | binary
+  @type key :: atom | binary | float | non_neg_integer
 
   @typedoc """
   `pair` is the type for a valid pair. A valid pair is a two tuple consisting of
@@ -51,9 +51,14 @@ defmodule Transmog do
 
   @typedoc """
   `raw_pair` is the type for a valid input pair. An input pair following the
-  string format using dot notation.
+  string format using dot notation. Alternatively you could choose to supply the
+  pairs manually. This could be useful if you want to use values that cannot be
+  easily parsed by the parser.
+
+  Some examples would be if you want to use integers, floats or map keys with
+  period characters in them.
   """
-  @type raw_pair :: {binary, binary}
+  @type raw_pair :: {binary | [key], binary | [key]}
 
   @typedoc """
   `result` is the type for the output from `format/2`.
