@@ -22,9 +22,13 @@ defmodule Transmog.Parser do
   understood by the formatter. It performs the parse according to the following
   rules:
 
-  1. Each pair must be a two tuple of strings.
+  1. Each pair must be a two tuple of strings or well formed pair.
   2. Each string can use dot notation to represent nested values.
   3. Atoms are represented literally, ie. ":name" for `:name`.
+
+  In special cases you may want to parse values such as numbers, periods,
+  floating point, etc. You can bypass the parser by supplying the paths
+  directly.
 
   ## Examples
 
@@ -35,6 +39,10 @@ defmodule Transmog.Parser do
       iex> pairs = [{":a.b", ":a.:b"}]
       iex> Transmog.Parser.parse(pairs)
       [{[:a, "b"], [:a, :b]}]
+
+      iex> pairs = [{[1, 2], "1.2"}]
+      iex> Transmog.Parser.parse(pairs)
+      [{[1, 2], ["1", "2"]}]
 
   """
   @spec parse(pairs :: [Transmog.raw_pair()]) :: {:ok, [Transmog.pair()]} | error
@@ -70,7 +78,8 @@ defmodule Transmog.Parser do
   def valid?(_), do: false
 
   # Converts a dot notation string into a path list. Atoms will be parsed from
-  # strings if applicable at this stage.
+  # strings if applicable at this stage. If the pair provided is already well
+  # formed then it will be returned as is.
   @spec do_parse(path :: binary | [Transmog.key()]) :: [Transmog.key()]
   defp do_parse(path) when is_list(path), do: path
 

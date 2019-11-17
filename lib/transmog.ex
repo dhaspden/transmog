@@ -27,6 +27,24 @@ defmodule Transmog do
       iex> formatted_source
       [%{"b" => %{"a" => "c"}}, %{"b" => %{"a" => "d"}}]
 
+  In order to apply the transformation to special values such as numbers, floats
+  and strings with periods in them then you can supply the path directly and
+  bypass the parser.
+
+  ## Examples
+
+      iex> key_mapping = [{[1], "1"}]
+      iex> source = [%{1 => "a"}]
+      iex> {:ok, formatted_source} = Transmog.format(source, key_mapping)
+      iex> formatted_source
+      [%{"1" => "a"}]
+
+      iex> key_mapping = [{["a.b"], "a_b"}]
+      iex> source = [%{"a.b" => "a"}]
+      iex> {:ok, formatted_source} = Transmog.format(source, key_mapping)
+      iex> formatted_source
+      [%{"a_b" => "a"}]
+
   """
 
   alias Transmog.Matcher
