@@ -20,6 +20,15 @@ defmodule Transmog.ParserTest do
 
       assert {:error, :invalid_pair} = Parser.parse(input)
     end
+
+    test "given a pre-defined path, then the path is returned as is" do
+      input = [{[:a, "b"], "a.b"}]
+      expected = [{[:a, "b"], ["a", "b"]}]
+
+      assert {:ok, output} = Parser.parse(input)
+
+      assert output == expected
+    end
   end
 
   describe "valid?/1" do

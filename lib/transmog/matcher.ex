@@ -21,7 +21,8 @@ defmodule Transmog.Matcher do
 
   """
   @spec find(pairs :: [Transmog.pair()], key :: Transmog.key()) :: Transmog.key()
-  def find(pairs, key) when is_list(pairs) and (is_atom(key) or is_binary(key)) do
+  def find(pairs, key)
+      when is_list(pairs) and (is_atom(key) or is_binary(key) or is_number(key)) do
     case Enum.find(pairs, &pair_matches?(key, &1)) do
       nil -> key
       {[_], [to]} -> to

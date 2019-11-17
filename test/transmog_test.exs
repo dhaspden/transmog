@@ -37,5 +37,29 @@ defmodule TransmogTest do
 
       assert Transmog.format(values, pairs) == expected
     end
+
+    test "given a value with an integer key, then the value is mapped correctly" do
+      values = %{1 => "a"}
+      pairs = [{[1], "1"}]
+      expected = {:ok, %{"1" => "a"}}
+
+      assert Transmog.format(values, pairs) == expected
+    end
+
+    test "given a value with a float key, then the value is mapped correctly" do
+      values = %{3.14 => "a"}
+      pairs = [{[3.14], [6.28]}]
+      expected = {:ok, %{6.28 => "a"}}
+
+      assert Transmog.format(values, pairs) == expected
+    end
+
+    test "given a value with a period in the key, then the value is mapped correctly" do
+      values = %{"a.b.c" => "a"}
+      pairs = [{["a.b.c"], "abc"}]
+      expected = {:ok, %{"abc" => "a"}}
+
+      assert Transmog.format(values, pairs) == expected
+    end
   end
 end

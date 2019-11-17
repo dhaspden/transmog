@@ -71,8 +71,10 @@ defmodule Transmog.Parser do
 
   # Converts a dot notation string into a path list. Atoms will be parsed from
   # strings if applicable at this stage.
-  @spec from_string(path :: binary) :: [Transmog.key()]
-  defp from_string(path) when is_binary(path) do
+  @spec do_parse(path :: binary | [Transmog.key()]) :: [Transmog.key()]
+  defp do_parse(path) when is_list(path), do: path
+
+  defp do_parse(path) when is_binary(path) do
     path
     |> String.split(".")
     |> Enum.map(&parse_field/1)
@@ -90,8 +92,9 @@ defmodule Transmog.Parser do
   # encountered.
   @spec parse_pair(pair :: Transmog.pair(), pairs :: [Transmog.pair()]) ::
           {:cont, [Transmog.pair()]} | {:halt, error}
-  defp parse_pair({from, to}, pairs) when is_binary(from) and is_binary(to) do
-    {:cont, pairs ++ [{from_string(from), from_string(to)}]}
+  defp parse_pair({from, to}, pairs)
+       when (is_binary(from) or is_list(from)) and (is_binary(to) or is_list(to)) do
+    {:cont, pairs ++ [{do_parse(from), do_parse(to)}]}
   end
 
   defp parse_pair(_, _), do: {:halt, {:error, :invalid_pair}}
