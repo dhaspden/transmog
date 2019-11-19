@@ -50,6 +50,30 @@ defmodule Transmog.KeyPairs do
   @type t :: %__MODULE__{list: list(key_pair)}
 
   @doc """
+  `find_match/2` takes a list of key pairs and a key and finds the pair in the
+  list which matches. If a match is found then the opposite key in the key
+  pair will be returned as the key that the value should map to.
+
+  ## Examples
+
+      iex> key_pairs = %Transmog.KeyPairs{list: [{[:a], ["a"]}]}
+      iex> Transmog.KeyPairs.find_match(key_pairs, [:a])
+      ["a"]
+
+      iex> key_pairs = %Transmog.KeyPairs{list: [{[:a], ["a"]}]}
+      iex> Transmog.KeyPairs.find_match(key_pairs, [:b])
+      [:b]
+
+  """
+  @spec find_match(key_pairs :: t, key :: list(term)) :: list(term)
+  def find_match(%__MODULE__{list: list}, key) do
+    case Enum.find(list, &pair_matches?(key, &1)) do
+      nil -> key
+      {_, to} -> to
+    end
+  end
+
+  @doc """
   `new/1` creates a new `%Transmog.KeyPairs{}` struct. It enforces that the key
   pairs are valid and have been previously parsed. If the key pairs are not
   valid then an error will be returned.
@@ -115,6 +139,12 @@ defmodule Transmog.KeyPairs do
   # Returns an error to indicate that the key pairs are not valid.
   @spec invalid_key_pairs :: invalid
   defp invalid_key_pairs, do: {:error, :invalid_key_pairs}
+
+  # Given a key pair and a key, returns if the key matches the left side of the
+  # key pair.
+  @spec pair_matches?(key :: list(term), pair :: key_pair) :: boolean
+  defp pair_matches?(key, {from, _}) when is_list(key) and is_list(from), do: from == key
+  defp pair_matches?(_, _), do: false
 
   # Returns whether or not a single pair is valid. A pair is considered valid if
   # they are both lists and have the same length.
