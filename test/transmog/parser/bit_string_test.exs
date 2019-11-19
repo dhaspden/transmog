@@ -5,8 +5,6 @@ defmodule Transmog.Parser.BitStringTest do
 
   alias Transmog.Parser
 
-  doctest Transmog.Parser
-
   describe "parse/1" do
     test "when an atom is in the string, then it is converted to an atom safely" do
       string = ":a"

@@ -5,8 +5,6 @@ defmodule Transmog.Parser.ListTest do
 
   alias Transmog.Parser
 
-  doctest Transmog.Parser
-
   describe "parse/1" do
     test "when the list is not empty, then it is returned as is" do
       list = [:a, :b]
