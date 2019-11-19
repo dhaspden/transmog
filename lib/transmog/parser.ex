@@ -26,6 +26,8 @@ defprotocol Transmog.Parser do
 
   """
 
+  @fallback_to_any true
+
   @doc """
   `parse/1` will convert a value into a valid key path. If applicable and the
   value is not valid, then `{:error, :invalid_key_path}` will be returned

@@ -5,7 +5,10 @@ defmodule Transmog.MixProject do
     [
       app: :transmog,
       deps: deps(),
-      dialyzer: [flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs]],
+      dialyzer: [
+        flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs],
+        remove_defaults: [:unknown]
+      ],
       elixir: "~> 1.9",
       preferred_cli_env: [
         coveralls: :test,
