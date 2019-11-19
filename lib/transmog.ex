@@ -48,8 +48,8 @@ defmodule Transmog do
   """
 
   alias Transmog.Matcher
-  alias Transmog.TempParser, as: Parser
   alias Transmog.Permutation
+  alias Transmog.TempParser, as: Parser
 
   @typedoc """
   `formattable` is the type of values that can be formatted by `format/2`.
