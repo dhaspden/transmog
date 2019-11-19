@@ -48,7 +48,7 @@ defmodule Transmog do
   """
 
   alias Transmog.Matcher
-  alias Transmog.Parser
+  alias Transmog.TempParser, as: Parser
   alias Transmog.Permutation
 
   @typedoc """
