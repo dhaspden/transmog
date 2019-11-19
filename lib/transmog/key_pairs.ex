@@ -93,7 +93,12 @@ defmodule Transmog.KeyPairs do
   @spec new(list :: list(key_pair)) :: {:ok, t} | invalid
   def new(list) when is_list(list) do
     key_pairs = %__MODULE__{list: list}
-    if valid?(key_pairs), do: {:ok, key_pairs}, else: invalid_key_pairs()
+
+    if valid?(key_pairs) do
+      {:ok, %{key_pairs | list: sort_list(list)}}
+    else
+      invalid_key_pairs()
+    end
   end
 
   def new(_), do: invalid_key_pairs()
@@ -154,6 +159,10 @@ defmodule Transmog.KeyPairs do
   end
 
   defp pair_valid?(_), do: false
+
+  # Sorts the list of key pairs in order from shortest to longest.
+  @spec sort_list(list :: list(key_pair)) :: list(key_pair)
+  defp sort_list(list) when is_list(list), do: Enum.sort_by(list, &length(elem(&1, 0)))
 
   # Returns whether or not all of the key pairs are valid.
   @spec valid?(key_pairs :: t) :: boolean
