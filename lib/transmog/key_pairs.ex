@@ -28,6 +28,8 @@ defmodule Transmog.KeyPairs do
 
   """
 
+  alias Transmog.Parser
+
   defstruct list: []
 
   @typedoc """
@@ -71,6 +73,44 @@ defmodule Transmog.KeyPairs do
   end
 
   def new(_), do: invalid_key_pairs()
+
+  @doc """
+  `parse/1` takes a list of key paths and attempts to coerce them into valid
+  key pairs. If successful then a `%Transmog.KeyPair{}` struct will be returned
+  with the key paths converted into the list format.
+
+  ## Examples
+
+      iex> key_paths = [{"a.b", ":a.:b"}]
+      iex> {:ok, key_pairs} = Transmog.KeyPairs.parse(key_paths)
+      iex> key_pairs
+      %Transmog.KeyPairs{list: [{["a", "b"], [:a, :b]}]}
+
+      iex> key_paths = [{"", ":a"}, {"a.b", ":a.:b"}]
+      iex> Transmog.KeyPairs.parse(key_paths)
+      {:error, :invalid_key_path}
+
+      iex> key_paths = [{"a", ":a.:b"}]
+      iex> Transmog.KeyPairs.parse(key_paths)
+      {:error, :invalid_key_pairs}
+
+  """
+  @spec parse(list :: list({term, term})) :: {:ok, t} | {:error, atom}
+  def parse(list) when is_list(list) do
+    list =
+      Enum.reduce(list, {:ok, []}, fn
+        {left, right}, {:ok, list} when is_list(list) ->
+          with {:ok, left} when is_list(left) <- Parser.parse(left),
+               {:ok, right} when is_list(right) <- Parser.parse(right) do
+            {:ok, list ++ [{left, right}]}
+          end
+
+        _, error ->
+          error
+      end)
+
+    with {:ok, list} when is_list(list) <- list, do: new(list)
+  end
 
   # Returns an error to indicate that the key pairs are not valid.
   @spec invalid_key_pairs :: invalid
