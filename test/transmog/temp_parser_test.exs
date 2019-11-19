@@ -3,7 +3,7 @@ defmodule Transmog.ParserTest do
 
   use ExUnit.Case
 
-  alias Transmog.Parser
+  alias Transmog.TempParser, as: Parser
 
   describe "parse/1" do
     test "given a valid list of pairs, then a list of parsers are returned" do

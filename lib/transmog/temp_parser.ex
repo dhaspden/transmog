@@ -1,4 +1,4 @@
-defmodule Transmog.Parser do
+defmodule Transmog.TempParser do
   @moduledoc """
   `Parser` is a module which parses the two tuple dot notation strings into a
   format that can be understood by the rest of the library. It is able to parse
