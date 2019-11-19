@@ -40,6 +40,8 @@ defmodule Transmog.KeyPairs do
 
   """
 
+  alias Transmog.InvalidKeyPairsError
+  alias Transmog.InvalidKeyPathError
   alias Transmog.Parser
 
   defstruct list: []
@@ -116,6 +118,30 @@ defmodule Transmog.KeyPairs do
   def new(_), do: invalid_key_pairs()
 
   @doc """
+  `new!/1` creates a new `%Transmog.KeyPairs{}` struct. It delegates execution
+  to `new/1`. If the key pairs are not valid then an error is raised otherwise
+  the result is unwrapped and returned.
+
+  ## Examples
+
+      iex> key_pairs = [{[:a, :b], [:b, :a]}]
+      iex> Transmog.KeyPairs.new!(key_pairs)
+      %Transmog.KeyPairs{list: [{[:a, :b], [:b, :a]}]}
+
+      iex> key_pairs = [{nil, [:a, :b]}]
+      iex> Transmog.KeyPairs.new!(key_pairs)
+      ** (Transmog.InvalidKeyPairsError) key pairs are not valid
+
+  """
+  @spec new!(list :: list(key_pair)) :: t
+  def new!(list) do
+    case new(list) do
+      {:ok, %__MODULE__{} = key_pairs} -> key_pairs
+      _ -> raise InvalidKeyPairsError
+    end
+  end
+
+  @doc """
   `parse/1` takes a list of key paths and attempts to coerce them into valid
   key pairs. If successful then a `%Transmog.KeyPair{}` struct will be returned
   with the key paths converted into the list format.
@@ -151,6 +177,35 @@ defmodule Transmog.KeyPairs do
       end)
 
     with {:ok, list} when is_list(list) <- list, do: new(list)
+  end
+
+  @doc """
+  `parse!/1` takes a list of key paths are coerces them into valid key pairs. It
+  delegates execution to `parse/1`. If the key pairs or any path are not valid
+  then an error will be raised. Otherwise the result is unwrapped and returned.
+
+  ## Examples
+
+      iex> key_paths = [{"a.b", ":a.:b"}]
+      iex> Transmog.KeyPairs.parse!(key_paths)
+      %Transmog.KeyPairs{list: [{["a", "b"], [:a, :b]}]}
+
+      iex> key_paths = [{"", ":a"}, {"a.b", ":a.:b"}]
+      iex> Transmog.KeyPairs.parse!(key_paths)
+      ** (Transmog.InvalidKeyPathError) key path is not valid
+
+      iex> key_paths = [{"a", ":a.:b"}]
+      iex> Transmog.KeyPairs.parse!(key_paths)
+      ** (Transmog.InvalidKeyPairsError) key pairs are not valid
+
+  """
+  @spec parse!(list :: list({term, term})) :: t
+  def parse!(list) do
+    case parse(list) do
+      {:ok, %__MODULE__{} = key_pairs} -> key_pairs
+      {:error, :invalid_key_pairs} -> raise InvalidKeyPairsError
+      {:error, :invalid_key_path} -> raise InvalidKeyPathError
+    end
   end
 
   # Returns an error to indicate that the key pairs are not valid.
