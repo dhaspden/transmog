@@ -16,6 +16,15 @@ defmodule Transmog.KeyPairsTest do
       assert list == key_pairs
     end
 
+    test "when multiple key pairs are given, then they are sorted by length" do
+      list = [{[:a, :b], [:b, :a]}, {[:a], [:b]}]
+      expected = [{[:a], [:b]}, {[:a, :b], [:b, :a]}]
+
+      assert {:ok, %KeyPairs{list: key_pairs}} = KeyPairs.new(list)
+
+      assert key_pairs == expected
+    end
+
     test "when the input is of the incorrect type, then an error is returned" do
       assert {:error, :invalid_key_pairs} = KeyPairs.new(nil)
       assert {:error, :invalid_key_pairs} = KeyPairs.new("string")
