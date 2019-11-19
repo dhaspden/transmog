@@ -28,8 +28,6 @@ defimpl Transmog.Parser, for: BitString do
 
   """
 
-  alias Transmog.KeyPair
-
   @doc """
   `parse/1` parses a string into a key path. If the string is empty then it is
   considered invalid and returned immediately. Non-empty strings will be parsed
