@@ -1,14 +1,18 @@
 defmodule Transmog.KeyPairs do
   @moduledoc """
-  `Transmog.KeyPairs` is a struct which holds the information about key pairs
-  and ensures that they are valid. A key pair is a list of mappings from one
-  path to another. For example, `{[:a, :b], [:b, :a]}` indicates that we are
-  transforming a map with keys `:a` and `:b` to now have the keys swapped with
-  the same values.
+  `Transmog.KeyPairs` is a struct which holds the information about a list of
+  `t:key_pair/0` and ensures that they are valid. A key pair is a list of
+  mappings from one path to another. For example, `{[:a, :b], [:b, :a]}`
+  indicates that we are transforming a map with keys `:a` and `:b` to now have
+  the keys swapped with the same values.
 
   You can create a new `%Transmog.KeyPairs{}` struct manually by calling the
   `new/1` function directly. This struct can be used in most of the core
   functionality in this library.
+
+  This library uses `parse/1` under the hood to coerce your key paths into a
+  format that can be understood by this struct. `parse/1` uses the
+  `Transmog.Parser` protocol for the type that is provided for the key path.
 
   ## Examples
 
@@ -18,13 +22,21 @@ defmodule Transmog.KeyPairs do
       %Transmog.KeyPairs{list: [{[:identity, :first_name], [:user_details, :first_name]}]}
 
   If you do not provide correct key pairs when this struct is created then you
-  will receive a validation error as a response instead.
+  will receive an `t:invalid/0` error as a response instead.
 
   ## Examples
 
       iex> key_pairs = [{nil, [:identity, :last_name]}]
       iex> Transmog.KeyPairs.new(key_pairs)
       {:error, :invalid_key_pairs}
+
+      iex> key_paths = [{nil, ":identity.:last_name"}]
+      iex> Transmog.KeyPairs.parse(key_paths)
+      {:error, :invalid_key_path} #=> Also possible to receive these errors
+
+  If you know the shape of your data structures in advance then you should
+  pre-compile your `%Transmog.KeyPairs{}` structs by calling `parse!/1` or
+  `new!/1` and saving the results somewhere where they can be reused.
 
   """
 
@@ -33,19 +45,19 @@ defmodule Transmog.KeyPairs do
   defstruct list: []
 
   @typedoc """
-  `invalid` is the type for when a key pair list is determined to not be valid
-  the struct is created using `new/1`.
+  `t:invalid/0` is the type for when a key pair list is determined to not be
+  valid the struct is created using `new/1`.
   """
   @type invalid :: {:error, :invalid_key_pairs}
 
   @typedoc """
-  `key_pair` is the type for a single key pair that is part of the list of key
-  pairs that this struct holds.
+  `t:key_pair/0` is the type for a single key pair that is part of the list of
+  key pairs that this struct holds.
   """
   @type key_pair :: {list(term), list(term)}
 
   @typedoc """
-  `t` is the type for the `Transmog.KeyPair` struct.
+  `t:t/0` is the type for the `Transmog.KeyPair` struct.
   """
   @type t :: %__MODULE__{list: list(key_pair)}
 
