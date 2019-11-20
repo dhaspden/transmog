@@ -85,6 +85,12 @@ defmodule Transmog do
 
   alias Transmog.KeyPairs
 
+  @typedoc """
+  `t:key_paths/0` is the type for a single tuple of key paths. Both sides can
+  be any type as long as they can be parsed by `Transmog.Parser`.
+  """
+  @type key_paths :: {term, term}
+
   @doc """
   `format/2` takes a source value and either a list of key paths or a
   `Transmog.KeyPair` struct directly and performs the key transformation on the
@@ -109,8 +115,8 @@ defmodule Transmog do
       %{a: %{b: "c"}}
 
   """
-  @spec format(source :: term, mapping :: KeyPairs.t() | list({term, term})) ::
-          {:ok, term} | {:error, atom}
+  @spec format(source :: term, mapping :: KeyPairs.t() | list(key_paths)) ::
+          {:ok, term} | KeyPairs.error()
   def format(source, %KeyPairs{} = key_pairs), do: {:ok, do_format(source, key_pairs)}
 
   def format(source, key_paths) do
@@ -142,7 +148,7 @@ defmodule Transmog do
       %{a: %{b: "c"}}
 
   """
-  @spec format!(source :: term, mapping :: KeyPairs.t() | list({term, term})) :: term
+  @spec format!(source :: term, mapping :: KeyPairs.t() | list(key_paths)) :: term
   def format!(source, %KeyPairs{} = key_pairs), do: do_format(source, key_pairs)
 
   def format!(source, key_paths) do

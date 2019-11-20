@@ -60,6 +60,12 @@ defmodule Transmog.KeyPairs do
   defstruct list: []
 
   @typedoc """
+  `t:error/0` is the type for when creating a new `Transmog.Keypair` struct
+  fails due to either an invalid path or pair.
+  """
+  @type error :: Parser.error() | invalid
+
+  @typedoc """
   `t:invalid/0` is the type for when a key pair list is determined to not be
   valid the struct is created using `new/1`.
   """
@@ -183,7 +189,7 @@ defmodule Transmog.KeyPairs do
       {:error, :invalid_key_pairs}
 
   """
-  @spec parse(list :: list({term, term})) :: {:ok, t} | {:error, atom}
+  @spec parse(list :: list(Transmog.key_paths())) :: {:ok, t} | error
   def parse(list) when is_list(list) do
     list =
       list
@@ -224,7 +230,7 @@ defmodule Transmog.KeyPairs do
       ** (Transmog.InvalidKeyPairsError) key pairs are not valid ({[\"a\"], [:a, :b]}, index 0)
 
   """
-  @spec parse!(list :: list({term, term})) :: t
+  @spec parse!(list :: list(Transmog.key_paths())) :: t
   def parse!(list) do
     list
     |> Enum.reduce([], fn
@@ -237,7 +243,7 @@ defmodule Transmog.KeyPairs do
   # parsing fails then the invalid value is returned as well so we can use it
   # when raising an error.
   @spec do_parse(key_path :: term) ::
-          {:ok, list(term) | {list(term), list(term)}} | {:error, {:invalid_key_path, term}}
+          {:ok, list(term) | key_pair} | {:error, {:invalid_key_path, term}}
   defp do_parse({left, right}) do
     with {:ok, left} <- do_parse(left),
          {:ok, right} <- do_parse(right) do
@@ -254,7 +260,7 @@ defmodule Transmog.KeyPairs do
 
   # Parses both sides of the key pairs and raises an error if there are any
   # issues with the input.
-  @spec do_parse!(key_pairs :: {term, term}) :: {list(term), list(term)}
+  @spec do_parse!(key_pairs :: Transmog.key_paths()) :: key_pair
   defp do_parse!({left, right}), do: {Parser.parse!(left), Parser.parse!(right)}
 
   # Returns an error to indicate that the key pairs are not valid.
