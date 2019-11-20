@@ -1,7 +1,8 @@
 defimpl Transmog.Parser, for: BitString do
   @moduledoc """
   Implementation of `Transmog.Parser` for strings. Parses strings which are
-  represented as a dot notation and maps them to values in a nested map or list.
+  represented as dot notation and maps them to values in a nested map, struct or
+  list.
 
   ## Examples
 
@@ -22,11 +23,14 @@ defimpl Transmog.Parser, for: BitString do
       iex> key_path
       ["credentials", :first_name]
 
+      #=> Notice: an empty string, like the empty list, is considered invalid
       iex> string = ""
       iex> Transmog.Parser.parse(string)
       {:error, :invalid_key_path}
 
   """
+
+  alias Transmog.Parser
 
   # The token that each part of the path is split on
   @token "."
@@ -47,7 +51,7 @@ defimpl Transmog.Parser, for: BitString do
       ["a", :b, "c"]
 
   """
-  @spec parse(string :: binary) :: {:ok, list(term)} | {:error, :invalid_key_path}
+  @spec parse(string :: binary) :: {:ok, list(term)} | Parser.error()
   def parse(""), do: {:error, :invalid_key_path}
 
   def parse(string) when is_binary(string) do

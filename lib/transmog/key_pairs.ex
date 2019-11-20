@@ -2,23 +2,27 @@ defmodule Transmog.KeyPairs do
   @moduledoc """
   `Transmog.KeyPairs` is a struct which holds the information about a list of
   `t:key_pair/0` and ensures that they are valid. A key pair is a list of
-  mappings from one path to another. For example, `{[:a, :b], [:b, :a]}`
-  indicates that we are transforming a map with keys `:a` and `:b` to now have
-  the keys swapped with the same values.
+  mappings from one path to another. For example, `{[:a], [:b]}` indicates that
+  we are transforming a map with keys `:a` and `:b` to now have the keys swapped
+  with the same values.
 
   You can create a new `%Transmog.KeyPairs{}` struct manually by calling the
-  `new/1` function directly. This struct can be used in most of the core
-  functionality in this library.
+  `new/1` and `new!/1` functions directly. This struct can be used in most of
+  the core functionality in this library.
 
-  This library uses `parse/1` under the hood to coerce your key paths into a
-  format that can be understood by this struct. `parse/1` uses the
-  `Transmog.Parser` protocol for the type that is provided for the key path.
+  This library uses `parse/1` and `parse!/1` under the hood to coerce your key
+  paths into a format that can be understood by this struct. These functions use
+  the `Transmog.Parser` protocol for the type that is provided for the key path.
 
   ## Examples
 
       iex> key_pairs = [{[:identity, :first_name], [:user_details, :first_name]}]
       iex> {:ok, %Transmog.KeyPairs{} = key_pairs} = Transmog.KeyPairs.new(key_pairs)
       iex> key_pairs
+      %Transmog.KeyPairs{list: [{[:identity, :first_name], [:user_details, :first_name]}]}
+
+      iex> key_pairs = [{[:identity, :first_name], [:user_details, :first_name]}]
+      iex> Transmog.KeyPairs.new!(key_pairs)
       %Transmog.KeyPairs{list: [{[:identity, :first_name], [:user_details, :first_name]}]}
 
   If you do not provide correct key pairs when this struct is created then you
@@ -34,10 +38,20 @@ defmodule Transmog.KeyPairs do
       iex> Transmog.KeyPairs.parse(key_paths)
       {:error, :invalid_key_path} #=> Also possible to receive these errors
 
+      iex> key_pairs = [{nil, [:identity, :last_name]}]
+      iex> Transmog.KeyPairs.new!(key_pairs)
+      ** (Transmog.InvalidKeyPairsError) key pairs are not valid ({nil, [:identity, :last_name]}, index 0)
+
+      iex> key_paths = [{nil, ":identity.:last_name"}]
+      iex> Transmog.KeyPairs.parse!(key_paths)
+      ** (Transmog.InvalidKeyPathError) key path is not valid (nil)
+
   If you know the shape of your data structures in advance then you should
   pre-compile your `%Transmog.KeyPairs{}` structs by calling `parse!/1` or
   `new!/1` and saving the results somewhere where they can be reused.
 
+  `Transmog.format/2` and `Transmog.format!/2` optimize for the case where you
+  provide this struct directly.
   """
 
   alias Transmog.InvalidKeyPairsError
