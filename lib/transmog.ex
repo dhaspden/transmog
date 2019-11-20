@@ -1,5 +1,87 @@
 defmodule Transmog do
-  @moduledoc false
+  @moduledoc """
+  `Transmog` is a module which provides the ability to map keys on nested maps,
+  lists and structs to new values. It is useful for when you have external data
+  that you want to convert into an internal format easily. This recursive
+  transformation is made using an internal concept known as key pairs.
+
+  Key pairs are a list of two-tuples which represent a mapping from a key in the
+  source map to a key in the destination map. The key mapping does not have to
+  be exhaustive and any values that are skipped are simply added to the result.
+
+  ## Examples
+
+      #=> "credentials", "first_name" to :identity, :first_name
+      [{["credentials", "first_name"], [:identity, :first_name]}]
+
+  When key pairs are simple they can be represented using an internal DSL which
+  is a dot notation string. These dot notation strings also support atoms if you
+  prefix them with `:`.
+
+  ## Examples
+
+      #=> Same as the previous example
+      [{"credentials.first_name", ":identity.:first_name"}]
+
+  All of the supported key pair formats implement the `Transmog.Parser`
+  protocol. Technically if you wanted to add support for a different type then
+  you could implement the protocol for them.
+
+  We validate key pairs when they are provided to the main entrypoint of the
+  library, `Transmog.format/2` and `Transmog.format!/2`. If the key pairs are
+  not valid then we will let you know with an error.
+
+  ## Examples
+
+      #=> Notice: key paths must be equal length!
+      iex> key_paths = [{"credentials", ":identity.:first_name"}]
+      iex> Transmog.format(%{"credentials" => "Mike Rudolph"}, key_paths)
+      {:error, :invalid_key_pairs}
+
+      iex> key_paths = [{"", ":last_name"}]
+      iex> Transmog.format(%{}, key_paths)
+      {:error, :invalid_key_path}
+
+  Once your key pairs are validated you can start to use them to transform your
+  nested maps and lists.
+
+  ## Examples
+
+      #=> Notice: you need to be explicit about which keys you want updated
+      iex> key_paths = [
+      ...>   {"credentials", ":identity"},
+      ...>   {"credentials.first_name", ":identity.:first_name"}
+      ...> ]
+      iex> source = %{"credentials" => %{"first_name" => "Tom"}}
+      iex> {:ok, result} = Transmog.format(source, key_paths)
+      iex> result
+      %{identity: %{first_name: "Tom"}}
+
+      iex> key_paths = [
+      ...>   {"credentials", ":identity"},
+      ...>   {"credentials.first_name", ":identity.:first_name"}
+      ...> ]
+      iex> source = [
+      ...>   %{"credentials" => %{"first_name" => "John"}},
+      ...>   %{"credentials" => %{"first_name" => "Sally"}}
+      ...> ]
+      iex> {:ok, result} = Transmog.format(source, key_paths)
+      iex> result
+      [%{identity: %{first_name: "John"}}, %{identity: %{first_name: "Sally"}}]
+
+  If you know that your key pairs are valid then you can use `format!/2` instead
+  and your results will be unwrapped automatically for you.
+
+  ## Examples
+
+      iex> key_paths = [{"name", ":name"}]
+      iex> source = %{"name" => "Jimmy"}
+      iex> Transmog.format!(source, key_paths)
+      %{name: "Jimmy"}
+
+  You can even transform your structs. When a struct is encountered during the
+  parse it will be converted into a map automatically for you.
+  """
 
   alias Transmog.KeyPairs
 

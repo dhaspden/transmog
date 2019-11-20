@@ -11,6 +11,8 @@ defimpl Transmog.Parser, for: Any do
 
   """
 
+  alias Transmog.Parser
+
   @doc """
   `parse/1` is the fallback implementation for any type that is not implemented
   by the parser. These values are all invalid by default. This function will
@@ -22,10 +24,10 @@ defimpl Transmog.Parser, for: Any do
   ## Examples
 
       iex> value = nil
-      iex> Transmog.Parser.parse(list)
+      iex> Transmog.Parser.parse(value)
       {:error, :invalid_key_path}
 
   """
-  @spec parse(value :: term) :: {:error, :invalid_key_path}
+  @spec parse(value :: term) :: Parser.error()
   def parse(_), do: {:error, :invalid_key_path}
 end

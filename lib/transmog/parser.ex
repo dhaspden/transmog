@@ -12,6 +12,7 @@ defprotocol Transmog.Parser do
   Currently the following types are supported by this library:
 
   * `binary`
+  * `nonempty_list(term)`
 
   ## Examples
 
@@ -26,13 +27,18 @@ defprotocol Transmog.Parser do
 
   """
 
+  @typedoc """
+  `t:error/0` is the type for the error that the parser should return if it
+  encounters a value that is not valid.
+  """
+  @type error :: {:error, :invalid_key_path}
+
   @fallback_to_any true
 
   @doc """
   `parse/1` will convert a value into a valid key path. If applicable and the
-  value is not valid, then `{:error, :invalid_key_path}` will be returned
-  instead.
+  value is not valid, then a value of `t:error/0` will be returned instead.
   """
-  @spec parse(data :: t) :: {:ok, list(term)} | {:error, :invalid_key_path}
+  @spec parse(data :: t) :: {:ok, list(term)} | error
   def parse(data)
 end
