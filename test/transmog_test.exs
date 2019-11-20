@@ -3,6 +3,7 @@ defmodule TransmogTest do
 
   use ExUnit.Case, async: true
 
+  alias Transmog.InvalidKeyPathError
   alias Transmog.KeyPairs
 
   doctest Transmog
@@ -98,6 +99,38 @@ defmodule TransmogTest do
       assert {:ok, result} = Transmog.format(source, key_paths)
 
       assert result == expected
+    end
+  end
+
+  describe "format!/2" do
+    test "when called with a valid key path, then the result is unwrapped" do
+      key_paths = [{"a", ":a"}, {"a.b", ":a.:b"}]
+      source = %{"a" => %{"b" => "c"}}
+      expected = %{a: %{b: "c"}}
+
+      result = Transmog.format!(source, key_paths)
+
+      assert result == expected
+    end
+
+    test "when called with a valid key pair struct, then the result is unwrapped" do
+      key_paths = [{"a", ":a"}, {"a.b", ":a.:b"}]
+      %KeyPairs{} = key_pairs = KeyPairs.parse!(key_paths)
+      source = %{"a" => %{"b" => "c"}}
+      expected = %{a: %{b: "c"}}
+
+      result = Transmog.format!(source, key_pairs)
+
+      assert result == expected
+    end
+
+    test "when called with an invalid key path, then an error is raised" do
+      key_paths = [{"", ":a"}]
+      source = %{"a" => "b"}
+
+      assert_raise InvalidKeyPathError, fn ->
+        Transmog.format!(source, key_paths)
+      end
     end
   end
 end

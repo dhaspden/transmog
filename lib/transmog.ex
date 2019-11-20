@@ -27,13 +27,45 @@ defmodule Transmog do
       %{a: %{b: "c"}}
 
   """
-  @spec format(source :: term, key_pairs :: KeyPairs.t()) :: {:ok, term} | {:error, atom}
+  @spec format(source :: term, mapping :: KeyPairs.t() | list({term, term})) ::
+          {:ok, term} | {:error, atom}
   def format(source, %KeyPairs{} = key_pairs), do: {:ok, do_format(source, key_pairs)}
 
   def format(source, key_paths) do
     with {:ok, %KeyPairs{} = key_pairs} <- KeyPairs.parse(key_paths) do
       format(source, key_pairs)
     end
+  end
+
+  @doc """
+  `format!/2` takes a source value and either a list of key paths or a
+  `%Transmog.KeyPair{}` struct directly and performs the key transformation
+  on the value.
+
+  This function will raise an error if the `%Transmog.KeyPair{}` struct cannot
+  be created by parsing the key paths. The result will be automatically
+  unwrapped if the operation is successful.
+
+  ## Examples
+
+      iex> key_paths = [{"a", ":a"}, {"a.b", ":a.:b"}]
+      iex> source = %{"a" => %{"b" => "c"}}
+      iex> Transmog.format!(source, key_paths)
+      %{a: %{b: "c"}}
+
+      iex> key_paths = [{"a", ":a"}, {"a.b", ":a.:b"}]
+      iex> %Transmog.KeyPairs{} = key_pairs = Transmog.KeyPairs.parse!(key_paths)
+      iex> source = %{"a" => %{"b" => "c"}}
+      iex> Transmog.format!(source, key_pairs)
+      %{a: %{b: "c"}}
+
+  """
+  @spec format!(source :: term, mapping :: KeyPairs.t() | list({term, term})) :: term
+  def format!(source, %KeyPairs{} = key_pairs), do: do_format(source, key_pairs)
+
+  def format!(source, key_paths) do
+    %KeyPairs{} = key_pairs = KeyPairs.parse!(key_paths)
+    format!(source, key_pairs)
   end
 
   # Formats a single level of a map or list. If the input is a list then the
