@@ -46,6 +46,12 @@ defmodule Transmog do
     Enum.map(source, &do_format(&1, key_pairs, prefix))
   end
 
+  defp do_format(%_{} = source, %KeyPairs{} = key_pairs, prefix) when is_list(prefix) do
+    source
+    |> Map.from_struct()
+    |> do_format(key_pairs, prefix)
+  end
+
   defp do_format(%{} = source, %KeyPairs{} = key_pairs, prefix) when is_list(prefix) do
     for {key, value} <- source, into: %{} do
       current_path = prefix ++ [key]

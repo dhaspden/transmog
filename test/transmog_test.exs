@@ -75,5 +75,29 @@ defmodule TransmogTest do
 
       assert result == expected
     end
+
+    defmodule TestStruct do
+      defstruct [:a, :b]
+    end
+
+    test "given a struct, then the keys are transformed into a map" do
+      key_paths = [{":a", "a"}, {":b", "b"}]
+      source = %TestStruct{a: "a", b: "b"}
+      expected = %{"a" => "a", "b" => "b"}
+
+      assert {:ok, result} = Transmog.format(source, key_paths)
+
+      assert result == expected
+    end
+
+    test "given nested structs, then each struct is transformed into a map" do
+      key_paths = [{":a", "a"}, {":a.:a", "a.a"}]
+      source = %TestStruct{a: %TestStruct{a: "a"}}
+      expected = %{"a" => %{"a" => "a", b: nil}, b: nil}
+
+      assert {:ok, result} = Transmog.format(source, key_paths)
+
+      assert result == expected
+    end
   end
 end
