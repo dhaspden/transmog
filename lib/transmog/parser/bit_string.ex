@@ -7,7 +7,7 @@ defimpl Transmog.Parser, for: BitString do
   ## Examples
 
       "a.:b.c" #=> References a map or list with key path ["a", :b, "c"]
-      ":a.1" #=> References a map or list with key path [:a, "1"]
+      ":a.1"   #=> References a map or list with key path [:a, "1"]
 
   As you can see there are some caveats to this dot notation:
 
