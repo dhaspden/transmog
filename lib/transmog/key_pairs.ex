@@ -6,7 +6,7 @@ defmodule Transmog.KeyPairs do
   we are transforming a map with keys `:a` and `:b` to now have the keys swapped
   with the same values.
 
-  You can create a new `%Transmog.KeyPairs{}` struct manually by calling the
+  You can create a new `Transmog.KeyPairs` struct manually by calling the
   `new/1` and `new!/1` functions directly. This struct can be used in most of
   the core functionality in this library.
 
@@ -47,8 +47,8 @@ defmodule Transmog.KeyPairs do
       ** (Transmog.InvalidKeyPathError) key path is not valid (nil)
 
   If you know the shape of your data structures in advance then you should
-  pre-compile your `%Transmog.KeyPairs{}` structs by calling `parse!/1` or
-  `new!/1` and saving the results somewhere where they can be reused.
+  pre-compile your `Transmog.KeyPairs` structs by calling `parse!/1` or `new!/1`
+  and saving the results somewhere where they can be reused.
 
   `Transmog.format/2` and `Transmog.format!/2` optimize for the case where you
   provide this struct directly.
@@ -101,7 +101,7 @@ defmodule Transmog.KeyPairs do
   end
 
   @doc """
-  `new/1` creates a new `%Transmog.KeyPairs{}` struct. It enforces that the key
+  `new/1` creates a new `Transmog.KeyPairs` struct. It enforces that the key
   pairs are valid and have been previously parsed. If the key pairs are not
   valid then an error will be returned.
 
@@ -131,9 +131,9 @@ defmodule Transmog.KeyPairs do
   def new(_), do: invalid_key_pairs()
 
   @doc """
-  `new!/1` creates a new `%Transmog.KeyPairs{}` struct. It delegates execution
-  to `new/1`. If the key pairs are not valid then an error is raised otherwise
-  the result is unwrapped and returned.
+  `new!/1` creates a new `Transmog.KeyPairs` struct. It delegates execution to
+  `new/1`. If the key pairs are not valid then an error is raised otherwise the
+  result is unwrapped and returned.
 
   ## Examples
 
@@ -164,7 +164,7 @@ defmodule Transmog.KeyPairs do
 
   @doc """
   `parse/1` takes a list of key paths and attempts to coerce them into valid
-  key pairs. If successful then a `%Transmog.KeyPair{}` struct will be returned
+  key pairs. If successful then a `Transmog.KeyPair` struct will be returned
   with the key paths converted into the list format.
 
   ## Examples
@@ -205,9 +205,9 @@ defmodule Transmog.KeyPairs do
   end
 
   @doc """
-  `parse!/1` takes a list of key paths are coerces them into valid key pairs. It
-  delegates execution to `parse/1`. If the key pairs or any path are not valid
-  then an error will be raised. Otherwise the result is unwrapped and returned.
+  `parse!/1` takes a list of key paths are coerces them into valid key pairs.
+  If the key pairs or any path are not valid then an error will be raised.
+  Otherwise the result is unwrapped and returned.
 
   ## Examples
 

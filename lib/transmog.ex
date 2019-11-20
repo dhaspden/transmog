@@ -28,8 +28,8 @@ defmodule Transmog do
   you could implement the protocol for them.
 
   We validate key pairs when they are provided to the main entrypoint of the
-  library, `Transmog.format/2` and `Transmog.format!/2`. If the key pairs are
-  not valid then we will let you know with an error.
+  library, `format/2` and `format!/2`. If the key pairs are not valid then we
+  will let you know with an error.
 
   ## Examples
 
@@ -87,8 +87,8 @@ defmodule Transmog do
 
   @doc """
   `format/2` takes a source value and either a list of key paths or a
-  `%Transmog.KeyPair{}` struct directly and performs the key transformation
-  on the value.
+  `Transmog.KeyPair` struct directly and performs the key transformation on the
+  value.
 
   If the key paths are given then they will be parsed using
   `Transmog.KeyPairs.parse/1` and will report errors if any occur during that.
@@ -121,12 +121,12 @@ defmodule Transmog do
 
   @doc """
   `format!/2` takes a source value and either a list of key paths or a
-  `%Transmog.KeyPair{}` struct directly and performs the key transformation
-  on the value.
+  `Transmog.KeyPair` struct directly and performs the key transformation on the
+  value.
 
-  This function will raise an error if the `%Transmog.KeyPair{}` struct cannot
-  be created by parsing the key paths. The result will be automatically
-  unwrapped if the operation is successful.
+  This function will raise an error if the `Transmog.KeyPair` struct cannot be
+  created by parsing the key paths. The result will be automatically unwrapped
+  if the operation is successful.
 
   ## Examples
 
