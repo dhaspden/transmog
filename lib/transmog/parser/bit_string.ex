@@ -23,13 +23,22 @@ defimpl Transmog.Parser, for: BitString do
       iex> key_path
       ["credentials", :first_name]
 
+      iex> string = "credentials.:first_name"
+      iex> Transmog.Parser.parse!(string)
+      ["credentials", :first_name]
+
       #=> Notice: an empty string, like the empty list, is considered invalid
       iex> string = ""
       iex> Transmog.Parser.parse(string)
       {:error, :invalid_key_path}
 
+      iex> string = ""
+      iex> Transmog.Parser.parse!(string)
+      ** (Transmog.InvalidKeyPathError) key path is not valid (\"\")
+
   """
 
+  alias Transmog.InvalidKeyPathError
   alias Transmog.Parser
 
   # The token that each part of the path is split on
@@ -62,6 +71,30 @@ defimpl Transmog.Parser, for: BitString do
 
     {:ok, parts}
   end
+
+  @doc """
+  `parse!/1` parses a string into a key path. If the string is empty then it is
+  considered invalid and an error is raised. Otherwise the parse will delegate
+  to `parse/1`.
+
+  ## Examples
+
+      iex> string = "a.:b.c"
+      iex> Transmog.Parser.parse!(string)
+      ["a", :b, "c"]
+
+      iex> string = ""
+      iex> Transmog.Parser.parse!(string)
+      ** (Transmog.InvalidKeyPathError) key path is not valid (\"\")
+
+  """
+  @spec parse!(string :: binary) :: list(term)
+  def parse!("") do
+    message = "key path is not valid (\"\")"
+    raise InvalidKeyPathError, message: message
+  end
+
+  def parse!(string) when is_binary(string), do: elem(parse(string), 1)
 
   # Parses a single field of the dot notation string. If the field begins with
   # a colon, then it is parsed as an atom. Only existing atoms will be used to

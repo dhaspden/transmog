@@ -20,6 +20,8 @@ defimpl Transmog.Parser, for: List do
 
   """
 
+  alias Transmog.InvalidKeyPathError
+
   @doc """
   `parse/1` parses a list into a key path. A key path is already represented by
   a list and therefore this function will return the list as is unless the list
@@ -39,4 +41,26 @@ defimpl Transmog.Parser, for: List do
   @spec parse(list :: list(term)) :: {:ok, list(term)} | {:error, :invalid_key_path}
   def parse([]), do: {:error, :invalid_key_path}
   def parse(list) when is_list(list), do: {:ok, list}
+
+  @doc """
+  `parse!/1` parses a list into a key path. A key path is already represented by
+  a list and therefore this function will return the list as is unless the list
+  is empty. If the list is empty then an error will be raised.
+
+  The list will be unwrapped automatically when it is returned.
+
+  ## Examples
+
+      iex> list = [1, nil]
+      iex> Transmog.Parser.parse!(list)
+      [1, nil]
+
+      iex> list = []
+      iex> Transmog.Parser.parse!(list)
+      ** (Transmog.InvalidKeyPathError) key path is not valid ([])
+
+  """
+  @spec parse!(list :: list(term)) :: list(term)
+  def parse!([]), do: raise(InvalidKeyPathError, message: "key path is not valid ([])")
+  def parse!(list) when is_list(list), do: list
 end

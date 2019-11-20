@@ -3,6 +3,7 @@ defmodule Transmog.Parser.BitStringTest do
 
   use ExUnit.Case, async: true
 
+  alias Transmog.InvalidKeyPathError
   alias Transmog.Parser
 
   describe "parse/1" do
@@ -37,6 +38,25 @@ defmodule Transmog.Parser.BitStringTest do
       string = ""
 
       assert {:error, :invalid_key_path} = Parser.parse(string)
+    end
+  end
+
+  describe "parse!/1" do
+    test "when a string is given, then it is converted into a path" do
+      string = "a"
+      expected = ["a"]
+
+      key_path = Parser.parse!(string)
+
+      assert key_path == expected
+    end
+
+    test "when an empty string is given, then an error is raised" do
+      expected = "key path is not valid (\"\")"
+
+      assert_raise InvalidKeyPathError, expected, fn ->
+        Parser.parse!("")
+      end
     end
   end
 end

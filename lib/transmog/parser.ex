@@ -41,4 +41,12 @@ defprotocol Transmog.Parser do
   """
   @spec parse(data :: t) :: {:ok, list(term)} | error
   def parse(data)
+
+  @doc """
+  `parse!/1` will convert a value into a valid key path. If the key path is not
+  valid then an error will be raised. The result will be unwrapped
+  automatically.
+  """
+  @spec parse!(data :: t) :: list(term)
+  def parse!(data)
 end
