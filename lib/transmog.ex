@@ -27,7 +27,7 @@ defmodule Transmog do
       %{a: %{b: "c"}}
 
   """
-  @spec format(source :: term, key_pairs :: KeyPairs.t) :: term
+  @spec format(source :: term, key_pairs :: KeyPairs.t()) :: term
   def format(source, %KeyPairs{} = key_pairs), do: {:ok, do_format(source, key_pairs)}
 
   def format(source, key_paths) do
@@ -55,7 +55,7 @@ defmodule Transmog do
 
   defp do_format(source, _, _), do: source
 
-  @spec match_path(key_pairs :: KeyPairs.t, path :: list(term)) :: term
+  @spec match_path(key_pairs :: KeyPairs.t(), path :: list(term)) :: term
   defp match_path(%KeyPairs{} = key_pairs, path) do
     key_pairs
     |> KeyPairs.find_match(path)
