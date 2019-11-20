@@ -130,16 +130,27 @@ defmodule Transmog.KeyPairs do
 
       iex> key_pairs = [{nil, [:a, :b]}]
       iex> Transmog.KeyPairs.new!(key_pairs)
-      ** (Transmog.InvalidKeyPairsError) key pairs are not valid
+      ** (Transmog.InvalidKeyPairsError) key pairs are not valid ({nil, [:a, :b]}, index 0)
 
   """
   @spec new!(list :: list(key_pair)) :: t
-  def new!(list) do
-    case new(list) do
-      {:ok, %__MODULE__{} = key_pairs} -> key_pairs
-      _ -> raise InvalidKeyPairsError
+  def new!(list) when is_list(list) do
+    # Validate the pairs one by one so that we can report on the error case
+    # specifically in the error message.
+    for {pair, index} <- Enum.with_index(list) do
+      if !pair_valid?(pair) do
+        message = "key pairs are not valid (#{inspect(pair)}, index #{index})"
+        raise InvalidKeyPairsError, message: message
+      end
     end
+
+    # We know the key pairs are valid because we validate them one by one above
+    list
+    |> new()
+    |> elem(1)
   end
+
+  def new!(_), do: raise(InvalidKeyPairsError)
 
   @doc """
   `parse/1` takes a list of key paths and attempts to coerce them into valid
@@ -195,20 +206,28 @@ defmodule Transmog.KeyPairs do
 
       iex> key_paths = [{"", ":a"}, {"a.b", ":a.:b"}]
       iex> Transmog.KeyPairs.parse!(key_paths)
-      ** (Transmog.InvalidKeyPathError) key path is not valid
+      ** (Transmog.InvalidKeyPathError) key path is not valid (\"\")
 
       iex> key_paths = [{"a", ":a.:b"}]
       iex> Transmog.KeyPairs.parse!(key_paths)
-      ** (Transmog.InvalidKeyPairsError) key pairs are not valid
+      ** (Transmog.InvalidKeyPairsError) key pairs are not valid ({[\"a\"], [:a, :b]}, index 0)
 
   """
   @spec parse!(list :: list({term, term})) :: t
   def parse!(list) do
-    case parse(list) do
-      {:ok, %__MODULE__{} = key_pairs} -> key_pairs
-      {:error, :invalid_key_pairs} -> raise InvalidKeyPairsError
-      {:error, :invalid_key_path} -> raise InvalidKeyPathError
-    end
+    list
+    |> Enum.reduce([], fn
+      {left, right}, list when is_list(list) ->
+        with {:ok, left} when is_list(left) <- do_parse(left),
+             {:ok, right} when is_list(right) <- do_parse(right) do
+          list ++ [{left, right}]
+        else
+          {:error, {_, key_path}} ->
+            message = "key path is not valid (#{inspect(key_path)})"
+            raise InvalidKeyPathError, message: message
+        end
+    end)
+    |> new!()
   end
 
   # Parses a single key path and returns the path if parsing is successful. If
