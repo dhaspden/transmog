@@ -61,7 +61,7 @@ jobs:
             - _build
             - deps
   test:
-    executor: test
+    executor: build
     steps:
       - attach_workspace:
           at: ~/
