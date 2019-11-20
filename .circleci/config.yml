@@ -52,7 +52,7 @@ jobs:
           at: ~/
       - run: mix credo --strict
       - run: mix format --check-formatted
-      - run: mix docs
+      - run: MIX_ENV=dev mix docs
       - restore_cache:
           key: plt-cache-{{ checksum "mix.lock" }}
       - run: mix dialyzer
