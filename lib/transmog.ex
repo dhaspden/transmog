@@ -27,7 +27,7 @@ defmodule Transmog do
       %{a: %{b: "c"}}
 
   """
-  @spec format(source :: term, key_pairs :: KeyPairs.t()) :: term
+  @spec format(source :: term, key_pairs :: KeyPairs.t()) :: {:ok, term} | {:error, atom}
   def format(source, %KeyPairs{} = key_pairs), do: {:ok, do_format(source, key_pairs)}
 
   def format(source, key_paths) do
@@ -55,8 +55,12 @@ defmodule Transmog do
 
   defp do_format(source, _, _), do: source
 
-  @spec match_path(key_pairs :: KeyPairs.t(), path :: list(term)) :: term
-  defp match_path(%KeyPairs{} = key_pairs, path) do
+  # Given the key pairs and path, attempts to find a match in the key pairs
+  # list. If no match is found then the key that was passed will be returned.
+  # Because we know the list isn't empty and that we fallback to the passed
+  # key, we know that `hd/1` should never raise.
+  @spec match_path(key_pairs :: KeyPairs.t(), path :: nonempty_list(term)) :: term
+  defp match_path(%KeyPairs{} = key_pairs, path) when is_list(path) do
     key_pairs
     |> KeyPairs.find_match(path)
     |> Enum.reverse()
