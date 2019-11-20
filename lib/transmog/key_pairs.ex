@@ -55,7 +55,6 @@ defmodule Transmog.KeyPairs do
   """
 
   alias Transmog.InvalidKeyPairsError
-  alias Transmog.InvalidKeyPathError
   alias Transmog.Parser
 
   defstruct list: []
@@ -152,10 +151,7 @@ defmodule Transmog.KeyPairs do
     # Validate the pairs one by one so that we can report on the error case
     # specifically in the error message.
     for {pair, index} <- Enum.with_index(list) do
-      if !pair_valid?(pair) do
-        message = "key pairs are not valid (#{inspect(pair)}, index #{index})"
-        raise InvalidKeyPairsError, message: message
-      end
+      if !pair_valid?(pair), do: InvalidKeyPairsError.new(pair, index)
     end
 
     # We know the key pairs are valid because we validate them one by one above
@@ -232,15 +228,7 @@ defmodule Transmog.KeyPairs do
   def parse!(list) do
     list
     |> Enum.reduce([], fn
-      {_, _} = pair, list when is_list(list) ->
-        case do_parse(pair) do
-          {:ok, {left, right} = pair} when is_list(left) and is_list(right) ->
-            list ++ [pair]
-
-          {:error, {_, key_path}} ->
-            message = "key path is not valid (#{inspect(key_path)})"
-            raise InvalidKeyPathError, message: message
-        end
+      {_, _} = pair, list when is_list(list) -> list ++ [do_parse!(pair)]
     end)
     |> new!()
   end
@@ -263,6 +251,11 @@ defmodule Transmog.KeyPairs do
       {:error, reason} -> {:error, {reason, key_path}}
     end
   end
+
+  # Parses both sides of the key pairs and raises an error if there are any
+  # issues with the input.
+  @spec do_parse!(key_pairs :: {term, term}) :: {list(term), list(term)}
+  defp do_parse!({left, right}), do: {Parser.parse!(left), Parser.parse!(right)}
 
   # Returns an error to indicate that the key pairs are not valid.
   @spec invalid_key_pairs :: invalid

@@ -49,8 +49,5 @@ defimpl Transmog.Parser, for: Any do
 
   """
   @spec parse!(value :: term) :: no_return
-  def parse!(value) do
-    message = "key path is not valid (#{inspect(value)})"
-    raise InvalidKeyPathError, message: message
-  end
+  def parse!(value), do: InvalidKeyPathError.new(value)
 end

@@ -61,6 +61,6 @@ defimpl Transmog.Parser, for: List do
 
   """
   @spec parse!(list :: list(term)) :: list(term)
-  def parse!([]), do: raise(InvalidKeyPathError, message: "key path is not valid ([])")
+  def parse!([]), do: InvalidKeyPathError.new([])
   def parse!(list) when is_list(list), do: list
 end

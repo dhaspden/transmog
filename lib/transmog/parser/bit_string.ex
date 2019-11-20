@@ -89,11 +89,7 @@ defimpl Transmog.Parser, for: BitString do
 
   """
   @spec parse!(string :: binary) :: list(term)
-  def parse!("") do
-    message = "key path is not valid (\"\")"
-    raise InvalidKeyPathError, message: message
-  end
-
+  def parse!(""), do: InvalidKeyPathError.new("")
   def parse!(string) when is_binary(string), do: elem(parse(string), 1)
 
   # Parses a single field of the dot notation string. If the field begins with
