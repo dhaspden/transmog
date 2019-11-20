@@ -29,6 +29,7 @@ executors:
       - image: circleci/elixir:1.9.2
         environment:
           MIX_ENV: test
+    working_directory: ~/lib
 jobs:
   build:
     executor: build
@@ -43,7 +44,7 @@ jobs:
           root: ~/
           paths:
             - .mix
-            - app
+            - lib
   check:
     executor: build
     steps:
