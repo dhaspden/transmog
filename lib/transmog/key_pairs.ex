@@ -178,12 +178,13 @@ defmodule Transmog.KeyPairs do
     list =
       list
       |> Enum.reduce({:ok, []}, fn
-        {left, right}, {:ok, list} when is_list(list) ->
-          with {:ok, left} when is_list(left) <- do_parse(left),
-               {:ok, right} when is_list(right) <- do_parse(right) do
-            {:ok, list ++ [{left, right}]}
-          else
-            {:error, {reason, _}} -> {:error, reason}
+        {_, _} = pair, {:ok, list} when is_list(list) ->
+          case do_parse(pair) do
+            {:ok, {left, right} = pair} when is_list(left) and is_list(right) ->
+              {:ok, list ++ [pair]}
+
+            {:error, {reason, _}} ->
+              {:error, reason}
           end
 
         _, error ->
@@ -217,11 +218,11 @@ defmodule Transmog.KeyPairs do
   def parse!(list) do
     list
     |> Enum.reduce([], fn
-      {left, right}, list when is_list(list) ->
-        with {:ok, left} when is_list(left) <- do_parse(left),
-             {:ok, right} when is_list(right) <- do_parse(right) do
-          list ++ [{left, right}]
-        else
+      {_, _} = pair, list when is_list(list) ->
+        case do_parse(pair) do
+          {:ok, {left, right} = pair} when is_list(left) and is_list(right) ->
+            list ++ [pair]
+
           {:error, {_, key_path}} ->
             message = "key path is not valid (#{inspect(key_path)})"
             raise InvalidKeyPathError, message: message
@@ -233,7 +234,15 @@ defmodule Transmog.KeyPairs do
   # Parses a single key path and returns the path if parsing is successful. If
   # parsing fails then the invalid value is returned as well so we can use it
   # when raising an error.
-  @spec do_parse(key_path :: term) :: {:ok, list(term)} | {:error, {:invalid_key_path, term}}
+  @spec do_parse(key_path :: term) ::
+          {:ok, list(term) | {list(term), list(term)}} | {:error, {:invalid_key_path, term}}
+  defp do_parse({left, right}) do
+    with {:ok, left} <- do_parse(left),
+         {:ok, right} <- do_parse(right) do
+      {:ok, {left, right}}
+    end
+  end
+
   defp do_parse(key_path) do
     case Parser.parse(key_path) do
       {:ok, _} = result -> result
