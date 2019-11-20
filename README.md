@@ -68,6 +68,15 @@ Once you have a key mapping defined you can then perform the translation using
 ```elixir
 iex> fields = %{"account" => %{"identity" => %{"first_name" => "Billy"}}}
 iex> Transmog.format(fields, @key_mapping)
+{:ok, %{user: %{details: %{first_name: "Bobby"}}}}
+```
+
+If you are confident that your key mapping is valid then you can unwrap the
+results by using `Transmog.format!/2`.
+
+```elixir
+iex> fields = %{"account" => %{"identity" => %{"first_name" => "Sally"}}}
+iex> Transmog.format!(fields, @key_mapping)
 %{user: %{details: %{first_name: "Bobby"}}}
 ```
 
