@@ -165,11 +165,14 @@ defmodule Transmog.KeyPairs do
   @spec parse(list :: list({term, term})) :: {:ok, t} | {:error, atom}
   def parse(list) when is_list(list) do
     list =
-      Enum.reduce(list, {:ok, []}, fn
+      list
+      |> Enum.reduce({:ok, []}, fn
         {left, right}, {:ok, list} when is_list(list) ->
-          with {:ok, left} when is_list(left) <- Parser.parse(left),
-               {:ok, right} when is_list(right) <- Parser.parse(right) do
+          with {:ok, left} when is_list(left) <- do_parse(left),
+               {:ok, right} when is_list(right) <- do_parse(right) do
             {:ok, list ++ [{left, right}]}
+          else
+            {:error, {reason, _}} -> {:error, reason}
           end
 
         _, error ->
@@ -205,6 +208,17 @@ defmodule Transmog.KeyPairs do
       {:ok, %__MODULE__{} = key_pairs} -> key_pairs
       {:error, :invalid_key_pairs} -> raise InvalidKeyPairsError
       {:error, :invalid_key_path} -> raise InvalidKeyPathError
+    end
+  end
+
+  # Parses a single key path and returns the path if parsing is successful. If
+  # parsing fails then the invalid value is returned as well so we can use it
+  # when raising an error.
+  @spec do_parse(key_path :: term) :: {:ok, list(term)} | {:error, {:invalid_key_path, term}}
+  defp do_parse(key_path) do
+    case Parser.parse(key_path) do
+      {:ok, _} = result -> result
+      {:error, reason} -> {:error, {reason, key_path}}
     end
   end
 

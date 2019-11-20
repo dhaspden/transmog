@@ -28,6 +28,9 @@ defimpl Transmog.Parser, for: BitString do
 
   """
 
+  # The token that each part of the path is split on
+  @token "."
+
   @doc """
   `parse/1` parses a string into a key path. If the string is empty then it is
   considered invalid and returned immediately. Non-empty strings will be parsed
@@ -50,7 +53,7 @@ defimpl Transmog.Parser, for: BitString do
   def parse(string) when is_binary(string) do
     parts =
       string
-      |> String.split(".")
+      |> split_on_token()
       |> Enum.map(&parse_field/1)
 
     {:ok, parts}
@@ -62,4 +65,9 @@ defimpl Transmog.Parser, for: BitString do
   @spec parse_field(field :: binary) :: atom | binary
   defp parse_field(":" <> field) when is_binary(field), do: String.to_existing_atom(field)
   defp parse_field(field) when is_binary(field), do: field
+
+  # Helper function which stores the logic for splitting a string on the token
+  # character. At this time the token character is a period.
+  @spec split_on_token(string :: binary) :: list(binary)
+  defp split_on_token(string) when is_binary(string), do: String.split(string, @token)
 end
