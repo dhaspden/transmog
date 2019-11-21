@@ -5,6 +5,8 @@ defmodule Transmog do
   that you want to convert into an internal format easily. This recursive
   transformation is made using an internal concept known as key pairs.
 
+  ## Key Pairs
+
   Key pairs are a list of two-tuples which represent a mapping from a key in the
   source map to a key in the destination map. The key mapping does not have to
   be exhaustive and any values that are skipped are simply added to the result.
@@ -23,9 +25,13 @@ defmodule Transmog do
       #=> Same as the previous example
       [{"credentials.first_name", ":identity.:first_name"}]
 
+  ## Parsing
+
   All of the supported key pair formats implement the `Transmog.Parser`
   protocol. Technically if you wanted to add support for a different type then
   you could implement the protocol for them.
+
+  ## Formatting
 
   We validate key pairs when they are provided to the main entrypoint of the
   library, `format/2` and `format!/2`. If the key pairs are not valid then we

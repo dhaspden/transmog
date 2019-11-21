@@ -21,9 +21,23 @@ defprotocol Transmog.Parser do
       iex> key_path
       ["credentials", :first_name]
 
+      iex> string = "credentials\\\\.first_name"
+      iex> {:ok, key_path} = Transmog.Parser.parse(string)
+      iex> key_path
+      ["credentials.first_name"]
+
       iex> string = ""
       iex> Transmog.Parser.parse(string)
       {:error, :invalid_key_path}
+
+  When you want to use a period character in your key path then you can escape
+  it with backslashes and it will be ignored when parsing the string.
+
+  ## Examples
+
+      string = "credentials\\\\.first_name"
+      Transmog.Parser.parse!(string)
+      #=> Will return ["credentials.first_name"]
 
   """
 

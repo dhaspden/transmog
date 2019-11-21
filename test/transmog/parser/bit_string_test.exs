@@ -39,6 +39,15 @@ defmodule Transmog.Parser.BitStringTest do
 
       assert {:error, :invalid_key_path} = Parser.parse(string)
     end
+
+    test "when a string contains an escaped period, then the period is preserved" do
+      string = "a\\.b"
+      expected = ["a.b"]
+
+      assert {:ok, key_path} = Parser.parse(string)
+
+      assert key_path == expected
+    end
   end
 
   describe "parse!/1" do

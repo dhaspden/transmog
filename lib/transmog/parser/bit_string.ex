@@ -13,8 +13,6 @@ defimpl Transmog.Parser, for: BitString do
 
   * You are not able to represent paths that contain anything other than atoms
     or strings.
-  * You are not able to represent strings that contain a dot, for example the
-    key path `["a.b", :c]`.
 
   ## Examples
 
@@ -26,6 +24,11 @@ defimpl Transmog.Parser, for: BitString do
       iex> string = "credentials.:first_name"
       iex> Transmog.Parser.parse!(string)
       ["credentials", :first_name]
+
+      #=> Notice: we can escape a period in order for it to be preserved
+      iex> string = "credentials\\\\.first_name"
+      iex> Transmog.Parser.parse!(string)
+      ["credentials.first_name"]
 
       #=> Notice: an empty string, like the empty list, is considered invalid
       iex> string = ""
@@ -59,6 +62,16 @@ defimpl Transmog.Parser, for: BitString do
       iex> key_path
       ["a", :b, "c"]
 
+      iex> string = "a\\\\.b.c"
+      iex> {:ok, key_path} = Transmog.Parser.parse(string)
+      iex> key_path
+      ["a.b", "c"]
+
+      iex> string = "a\\\\:b.c"
+      iex> {:ok, key_path} = Transmog.Parser.parse!(string)
+      iex> key_path
+      ["a.:b", "c"]
+
   """
   @spec parse(string :: binary) :: {:ok, list(term)} | Parser.error()
   def parse(""), do: {:error, :invalid_key_path}
@@ -83,6 +96,14 @@ defimpl Transmog.Parser, for: BitString do
       iex> Transmog.Parser.parse!(string)
       ["a", :b, "c"]
 
+      iex> string = "a\\\\.b.c"
+      iex> Transmog.Parser.parse!(string)
+      ["a.b", "c"]
+
+      iex> string = "a\\\\:b.c"
+      iex> Transmog.Parser.parse!(string)
+      ["a.:b", "c"]
+
       iex> string = ""
       iex> Transmog.Parser.parse!(string)
       ** (Transmog.InvalidKeyPathError) key path is not valid (\"\")
@@ -102,5 +123,9 @@ defimpl Transmog.Parser, for: BitString do
   # Helper function which stores the logic for splitting a string on the token
   # character. At this time the token character is a period.
   @spec split_on_token(string :: binary) :: list(binary)
-  defp split_on_token(string) when is_binary(string), do: String.split(string, @token)
+  defp split_on_token(string) when is_binary(string) do
+    string
+    |> String.split(~r[(?<!\\)#{Regex.escape(@token)}])
+    |> Enum.map(&String.replace(&1, "\\", ""))
+  end
 end
