@@ -134,4 +134,16 @@ defmodule Transmog.KeyPairsTest do
       end
     end
   end
+
+  describe "reverse/1" do
+    test "when a key pair is given, then the list is reversed" do
+      key_paths = [{"a", ":a"}, {"a.b", ":a.:b"}]
+      expected = [{[:a], ["a"]}, {[:a, :b], ["a", "b"]}]
+      %KeyPairs{} = key_pairs = KeyPairs.parse!(key_paths)
+
+      assert %KeyPairs{list: key_pairs} = KeyPairs.reverse(key_pairs)
+
+      assert key_pairs == expected
+    end
+  end
 end

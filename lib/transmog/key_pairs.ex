@@ -239,6 +239,25 @@ defmodule Transmog.KeyPairs do
     |> new!()
   end
 
+  @doc """
+  `reverse/1` takes a `Transmog.KeyPairs` and reverses each individual key pair
+  in the list of key pairs. This could be useful if you wanted to reverse a
+  format without having to define two separate key pairs manually.
+
+  ## Examples
+
+      iex> key_paths = [{"a", "b"}]
+      iex> %Transmog.KeyPairs{} = key_pairs = Transmog.KeyPairs.parse!(key_paths)
+      iex> Transmog.KeyPairs.reverse(key_pairs)
+      %Transmog.KeyPairs{list: [{["b"], ["a"]}]}
+
+  """
+  @spec reverse(key_pairs :: t) :: t
+  def reverse(%__MODULE__{list: list} = key_pairs) when is_list(list) do
+    list = Enum.map(list, &{elem(&1, 1), elem(&1, 0)})
+    %{key_pairs | list: list}
+  end
+
   # Parses a single key path and returns the path if parsing is successful. If
   # parsing fails then the invalid value is returned as well so we can use it
   # when raising an error.
