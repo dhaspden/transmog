@@ -67,10 +67,9 @@ defmodule Transmog.MixProject do
   defp description do
     """
     Transmog is a module which allows for easy transformations to be made to
-    deeply nested maps, lists and structs. It is useful mapping keys on maps
-    to new values in a way that is easily reproducible. One case where you may
-    want Transmog is when converting map keys on values from external API to
-    match an internal format.
+    deeply nested maps, lists and structs. One case where you may want Transmog
+    is when converting map keys on values from external API to match an internal
+    format.
     """
   end
 end
