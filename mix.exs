@@ -8,6 +8,7 @@ defmodule Transmog.MixProject do
       app: :transmog,
       consolidate_protocols: Mix.env() != :test,
       deps: deps(),
+      description: description(),
       dialyzer: [
         flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs],
         remove_defaults: [:unknown]
@@ -61,5 +62,15 @@ defmodule Transmog.MixProject do
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test}
     ]
+  end
+
+  defp description do
+    """
+    Transmog is a module which allows for easy transformations to be made to
+    deeply nested maps, lists and structs. It is useful mapping keys on maps
+    to new values in a way that is easily reproducible. One case where you may
+    want Transmog is when converting map keys on values from external API to
+    match an internal format.
+    """
   end
 end
