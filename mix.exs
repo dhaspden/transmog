@@ -1,20 +1,38 @@
 defmodule Transmog.MixProject do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [
       app: :transmog,
+      consolidate_protocols: Mix.env() != :test,
       deps: deps(),
       dialyzer: [
         flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs],
         remove_defaults: [:unknown]
       ],
       docs: [
+        canonical: "https://hexdocs.pm/transmog",
+        extras: ["README.md"],
         main: "Transmog",
-        extras: ["README.md"]
+        source_ref: "v#{@version}",
+        source_url: "https://github.com/dhaspden/transmog"
       ],
       elixir: "~> 1.9",
       name: "Transmog",
+      package: [
+        files: [
+          ".credo.exs",
+          ".formatter.exs",
+          "mix.exs",
+          "README.md",
+          "lib"
+        ],
+        licenses: ["MIT"],
+        links: %{"Github" => "https://github.com/dhaspden/transmog"},
+        maintainers: ["Dylan Aspden"]
+      ],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -24,7 +42,7 @@ defmodule Transmog.MixProject do
       source_url: "https://github.com/dhaspden/transmog",
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "0.1.0"
+      version: @version
     ]
   end
 
