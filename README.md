@@ -38,7 +38,7 @@ To install `transmog` add the following to your `mix.exs` file and run
 
 ```elixir
 defp deps do
-  [{:transmog, "~> 0.1.0"}]
+  [{:transmog, "~> 0.1"}]
 end
 ```
 
