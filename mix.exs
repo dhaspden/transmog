@@ -20,7 +20,7 @@ defmodule Transmog.MixProject do
         source_ref: "v#{@version}",
         source_url: "https://github.com/dhaspden/transmog"
       ],
-      elixir: "~> 1.9",
+      elixir: "~> 1.6",
       name: "Transmog",
       package: [
         files: [

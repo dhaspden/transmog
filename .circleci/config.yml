@@ -26,7 +26,7 @@ commands:
 executors:
   build:
     docker:
-      - image: circleci/elixir:1.9.2
+      - image: circleci/elixir:1.6.6
         environment:
           MIX_ENV: test
     working_directory: ~/lib
